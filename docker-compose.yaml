@@ -7,9 +7,6 @@ services:
     libsql:
         container_name: openstatus-libsql
         image: ghcr.io/tursodatabase/libsql-server:latest
-        ports:
-            - "8080:8080"
-            - "5001:5001"
         volumes:
             - libsql-data:/var/lib/sqld
         environment:
@@ -22,22 +19,6 @@ services:
             start_period: 10s
         restart: unless-stopped
 
-    tinybird-local:
-        container_name: openstatus-tinybird
-        image: tinybirdco/tinybird-local:latest
-        platform: linux/amd64
-        ports:
-            - "7181:7181"
-        environment:
-            - COMPATIBILITY_MODE=1
-        healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost:7181/"]
-            interval: 15s
-            timeout: 5s
-            retries: 5
-            start_period: 20s
-        restart: unless-stopped
-
     # Internal Services
     workflows:
         container_name: openstatus-workflows
@@ -45,8 +26,6 @@ services:
             context: .
             dockerfile: apps/workflows/Dockerfile
         image: openstatus/workflows:latest
-        ports:
-            - "3000:3000"
         environment:
             - DATABASE_URL=http://libsql:8080
             - PORT=3000
